@@ -11,8 +11,8 @@ final class ProductQuestionMetaBox
     public const META_PHONE = '_question_phone';
     public const META_ANSWER = '_question_answer';
 
-    public const NONCE_ACTION = 'save_product_question';
-    public const NONCE_NAME = 'product_question_nonce';
+    private const NONCE_ACTION = 'save_product_question';
+    private const NONCE_NAME = 'product_question_nonce';
 
     public function register(): void
     {
@@ -24,13 +24,14 @@ final class ProductQuestionMetaBox
             'normal',
             'high',
         );
-
-        add_action('save_post_product_question', $this->save(...));
     }
 
     public function render(\WP_Post $post): void
     {
-        wp_nonce_field(self::NONCE_ACTION, self::NONCE_NAME);
+        wp_nonce_field(
+            self::NONCE_ACTION,
+            self::NONCE_NAME
+        );
 
         $productId = (int) get_post_meta(
             $post->ID,
@@ -57,8 +58,8 @@ final class ProductQuestionMetaBox
         );
 
         $products = wc_get_products([
-            'status' => 'publish',
-            'limit'  => -1,
+            'status'  => 'publish',
+            'limit'   => -1,
             'orderby' => 'name',
             'order'   => 'ASC',
         ]);
@@ -71,15 +72,15 @@ final class ProductQuestionMetaBox
         </p>
 
         <select
-            id="product_question_product_id"
-            name="product_question_product_id"
-            style="width: 100%;"
+                id="product_question_product_id"
+                name="product_question_product_id"
+                style="width: 100%;"
         >
             <option value="">— Select product —</option>
 
             <?php foreach ($products as $product) : ?>
                 <option
-                    value="<?php echo esc_attr((string) $product->get_id()); ?>"
+                        value="<?php echo esc_attr((string) $product->get_id()); ?>"
                     <?php selected($productId, $product->get_id()); ?>
                 >
                     <?php echo esc_html($product->get_name()); ?>
@@ -94,11 +95,11 @@ final class ProductQuestionMetaBox
         </p>
 
         <input
-            type="email"
-            id="product_question_email"
-            name="product_question_email"
-            value="<?php echo esc_attr($email); ?>"
-            style="width: 100%;"
+                type="email"
+                id="product_question_email"
+                name="product_question_email"
+                value="<?php echo esc_attr($email); ?>"
+                style="width: 100%;"
         >
 
         <p>
@@ -108,11 +109,11 @@ final class ProductQuestionMetaBox
         </p>
 
         <input
-            type="text"
-            id="product_question_phone"
-            name="product_question_phone"
-            value="<?php echo esc_attr($phone); ?>"
-            style="width: 100%;"
+                type="text"
+                id="product_question_phone"
+                name="product_question_phone"
+                value="<?php echo esc_attr($phone); ?>"
+                style="width: 100%;"
         >
 
         <p>
@@ -122,10 +123,10 @@ final class ProductQuestionMetaBox
         </p>
 
         <textarea
-            id="product_question_answer"
-            name="product_question_answer"
-            rows="6"
-            style="width: 100%;"
+                id="product_question_answer"
+                name="product_question_answer"
+                rows="6"
+                style="width: 100%;"
         ><?php echo esc_textarea($answer); ?></textarea>
 
         <?php
@@ -136,14 +137,19 @@ final class ProductQuestionMetaBox
         if (
             ! isset($_POST[self::NONCE_NAME]) ||
             ! wp_verify_nonce(
-                sanitize_text_field(wp_unslash($_POST[self::NONCE_NAME])),
+                sanitize_text_field(
+                    wp_unslash($_POST[self::NONCE_NAME])
+                ),
                 self::NONCE_ACTION
             )
         ) {
             return;
         }
 
-        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        if (
+            defined('DOING_AUTOSAVE') &&
+            DOING_AUTOSAVE
+        ) {
             return;
         }
 
@@ -156,20 +162,45 @@ final class ProductQuestionMetaBox
             : 0;
 
         $email = isset($_POST['product_question_email'])
-            ? sanitize_email(wp_unslash($_POST['product_question_email']))
+            ? sanitize_email(
+                wp_unslash($_POST['product_question_email'])
+            )
             : '';
 
         $phone = isset($_POST['product_question_phone'])
-            ? sanitize_text_field(wp_unslash($_POST['product_question_phone']))
+            ? sanitize_text_field(
+                wp_unslash($_POST['product_question_phone'])
+            )
             : '';
 
         $answer = isset($_POST['product_question_answer'])
-            ? sanitize_textarea_field(wp_unslash($_POST['product_question_answer']))
+            ? sanitize_textarea_field(
+                wp_unslash($_POST['product_question_answer'])
+            )
             : '';
 
-        update_post_meta($postId, self::META_PRODUCT_ID, $productId);
-        update_post_meta($postId, self::META_EMAIL, $email);
-        update_post_meta($postId, self::META_PHONE, $phone);
-        update_post_meta($postId, self::META_ANSWER, $answer);
+        update_post_meta(
+            $postId,
+            self::META_PRODUCT_ID,
+            $productId
+        );
+
+        update_post_meta(
+            $postId,
+            self::META_EMAIL,
+            $email
+        );
+
+        update_post_meta(
+            $postId,
+            self::META_PHONE,
+            $phone
+        );
+
+        update_post_meta(
+            $postId,
+            self::META_ANSWER,
+            $answer
+        );
     }
 }

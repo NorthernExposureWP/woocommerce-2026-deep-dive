@@ -13,6 +13,13 @@ final class ProductQuestionColumns
             $this->addColumns(...)
         );
 
+        add_filter(
+            'the_title',
+            $this->replaceTitle(...),
+            10,
+            2
+        );
+
         add_action(
             'manage_product_question_posts_custom_column',
             $this->renderColumn(...),
@@ -22,11 +29,33 @@ final class ProductQuestionColumns
     }
 
     /**
+     * @param string $title
+     * @param int $postId
+     * @return string
+     */
+    public function replaceTitle(string $title, int $postId): string
+    {
+        if (! is_admin()) {
+            return $title;
+        }
+
+        $screen = get_current_screen();
+
+        if (!$screen || $screen->post_type !== 'product_question'
+        ) {
+            return $title;
+        }
+
+        return get_the_content(null, false, $postId) ?: '—';
+    }
+
+    /**
      * @param array<string, string> $columns
      * @return array<string, string>
      */
     public function addColumns(array $columns): array
     {
+        $columns['title'] = 'Question';
         $columns['product'] = 'Product';
         $columns['question_email'] = 'Email';
 
@@ -42,19 +71,16 @@ final class ProductQuestionColumns
                     ProductQuestionMetaBox::META_PRODUCT_ID,
                     true
                 );
-
                 if ($productId === 0) {
                     echo '—';
                     return;
                 }
-
                 $product = wc_get_product($productId);
 
                 if (! $product) {
                     echo '—';
                     return;
                 }
-
                 printf(
                     '<a href="%s">%s</a>',
                     esc_url(get_edit_post_link($productId)),
@@ -69,7 +95,6 @@ final class ProductQuestionColumns
                     ProductQuestionMetaBox::META_EMAIL,
                     true
                 );
-
                 echo esc_html($email ?: '—');
 
                 break;

@@ -17,7 +17,6 @@ final class ProductQuestionPostType
             'show_ui' => true,
             'show_in_menu' => true,
             'supports' => [
-                'title',
                 'editor',
                 'author',
             ],
