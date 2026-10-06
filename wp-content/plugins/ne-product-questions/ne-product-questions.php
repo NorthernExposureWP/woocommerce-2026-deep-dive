@@ -1,12 +1,11 @@
 <?php
-
 /**
- * Plugin Name: NE Categories Lab
- * Description: Educational plugin for WooCommerce Categories CRUD API.
+ * Plugin Name: NE Product Questions
+ * Description: Product Questions & Answers for WooCommerce.
  * Version: 1.0.0
  * Requires PHP: 8.4
  * Requires Plugins: woocommerce
- * Text Domain: ne-categoreies-lab
+ * Text Domain: ne-product-questions
  */
 declare(strict_types=1);
 

@@ -70,7 +70,6 @@ final class ProductQuestionTab
 
         if (!$questions->have_posts()) {
             echo '<p>No questions yet.</p>';
-            return;
         }
 
         while ($questions->have_posts()) {
@@ -101,6 +100,7 @@ final class ProductQuestionTab
             </div>
             <?php
         }
+        wp_reset_postdata();
         ?>
         <h3>Ask your Question</h3>
         <form method="post">
@@ -158,7 +158,5 @@ final class ProductQuestionTab
             </button>
         </form>
         <?php
-
-        wp_reset_postdata();
     }
 }

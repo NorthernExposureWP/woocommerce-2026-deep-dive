@@ -45,13 +45,6 @@ final class ProductQuestionSubmission
             );
         }
 
-        if ($productId === 0) {
-            $this->redirectWithError(
-                home_url(),
-                'invalid_product'
-            );
-        }
-
         $productUrl = $product->get_permalink();
 
         $email = isset($_POST['product_question_email'])
@@ -93,7 +86,10 @@ final class ProductQuestionSubmission
         ], true);
 
         if (is_wp_error($postId)) {
-            return;
+            $this->redirectWithError(
+                $productUrl,
+                'save_failed'
+            );
         }
 
         update_post_meta(
