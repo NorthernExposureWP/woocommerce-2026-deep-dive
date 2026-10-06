@@ -34,6 +34,26 @@ final class ProductQuestionSubmission
             ? absint($_POST['product_question_product_id'])
             : 0;
 
+        $product = $productId > 0
+            ? wc_get_product($productId)
+            : false;
+
+        if (!$product) {
+            $this->redirectWithError(
+                home_url(),
+                'invalid_product'
+            );
+        }
+
+        if ($productId === 0) {
+            $this->redirectWithError(
+                home_url(),
+                'invalid_product'
+            );
+        }
+
+        $productUrl = $product->get_permalink();
+
         $email = isset($_POST['product_question_email'])
             ? sanitize_email(
                 wp_unslash($_POST['product_question_email'])
@@ -52,20 +72,18 @@ final class ProductQuestionSubmission
             )
             : '';
 
-        if ($productId === 0) {
-            return;
-        }
-
-        if (! wc_get_product($productId)) {
-            return;
-        }
-
         if (! is_email($email)) {
-            return;
+            $this->redirectWithError(
+                $productUrl,
+                'invalid_email'
+            );
         }
 
         if ($question === '') {
-            return;
+            $this->redirectWithError(
+                $productUrl,
+                'empty_question'
+            );
         }
 
         $postId = wp_insert_post([
@@ -96,8 +114,32 @@ final class ProductQuestionSubmission
             $phone
         );
 
+        $this->redirectWithSuccess($productUrl);
+    }
+
+    private function redirectWithError(string $url, string $error): never
+    {
         wp_safe_redirect(
-            wp_get_referer() ?: get_permalink($productId)
+            add_query_arg(
+                'question_error',
+                $error,
+                $url
+            )
+        );
+
+        exit;
+    }
+
+    private function redirectWithSuccess(string $url): never
+    {
+        $url = add_query_arg(
+            'question_submitted',
+            '1',
+            $url
+        );
+
+        wp_safe_redirect(
+            $url . '#tab-questions'
         );
 
         exit;

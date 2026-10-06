@@ -35,18 +35,17 @@ final class ProductQuestionColumns
      */
     public function replaceTitle(string $title, int $postId): string
     {
-        if (! is_admin()) {
+        if (!is_admin()) {
             return $title;
         }
 
         $screen = get_current_screen();
 
-        if (!$screen || $screen->post_type !== 'product_question'
-        ) {
+        if (!$screen || $screen->post_type !== 'product_question') {
             return $title;
         }
 
-        return get_the_content(null, false, $postId) ?: '—';
+        return get_post_field('post_content', $postId) ?: '—';
     }
 
     /**

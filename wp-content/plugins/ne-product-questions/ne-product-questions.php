@@ -33,12 +33,51 @@ add_action('add_meta_boxes', $metaBox->register(...));
 add_action('save_post_product_question', $metaBox->save(...), 10, 1);
 add_action('template_redirect', $submission->handle(...));
 
+add_action('wp_enqueue_scripts', function (): void {
+    if (!is_product()) {
+        return;
+    }
+
+    wp_enqueue_script(
+        'ne-product-questions-tabs',
+        plugins_url(
+            'assets/questions-tabs.js',
+            __FILE__
+        ),
+        [],
+        '1.0.0',
+        [
+            'in_footer' => true,
+        ]
+    );
+});
+
 add_filter('woocommerce_product_tabs', function (array $tabs): array {
     $tabs['questions'] = [
         'title'    => 'Questions & Answers',
         'priority' => 50,
         'callback' => function (): void {
             global $product;
+
+            if (isset($_GET['question_submitted'])) {
+                echo '<p>Your question has been submitted successfully.</p>';
+            }
+
+            if (
+                isset($_GET['question_error']) &&
+                in_array(
+                    $_GET['question_error'],
+                    [
+                        'invalid_product',
+                        'invalid_email',
+                        'empty_question',
+                        'save_failed',
+                    ],
+                    true
+                )
+            ) {
+                echo '<p>There was a problem submitting your question.</p>';
+            }
 
             if (! $product instanceof \WC_Product) {
                 return;
